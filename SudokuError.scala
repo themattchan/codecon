@@ -1,21 +1,22 @@
 /* Finds erroneous entries in completed Sudokus and corrects them */
 object SudokuError {
-  type MIndex      = (Int, Int)
-  type IndexedCell = (Int, MIndex)
-  type IndexedRow  = Vector[IndexedCell]
-  type Grid        = Vector[IndexedRow]
+  type MIndex      = (Int, Int)          // row, col
+  type IndexedCell = (Int, MIndex)       // val, idx
+  type IndexedRow  = Vector[IndexedCell] // len 9
+  type Grid        = Vector[IndexedRow]  // len 9
+
+  val nums = (1 to 9).toSet
 
   def readSudoku() : Grid =  {
     { for (r <- 0 to 8) yield
-    { val ridxs = (0 to 8).map((r,_))
-      scala.io.StdIn.readLine.split(" ").map(_.toInt).zip(ridxs).toVector }
+    { val row_idxs = (0 to 8).map((r,_))
+      scala.io.StdIn.readLine.split(" ").map(_.toInt).zip(row_idxs).toVector }
     }.toVector
   }
 
   def findDups(v: IndexedRow) : Option[List[IndexedCell]] = {
     val g = v.groupBy{ case (value,_) => value }.filter{ case (_,v) => v.length > 1 }
-    if (g.isEmpty) None
-    else           Some(g.values.toList.flatten)
+    Option(g.values.toList.flatten)
   }
 
   def dupsInSect(rs: Grid) : Set[IndexedCell] =
@@ -34,12 +35,10 @@ object SudokuError {
     val cs  = getCols(sud)
     val ts  = get3x3s(sud)
 
-    val dups  = dupsInSect(rs) & dupsInSect(cs) & dupsInSect(ts)
-    val dups1 = dups.toList.sortBy{ case (_,idx) => idx }
+    val dups1  = dupsInSect(rs) & dupsInSect(cs) & dupsInSect(ts)
+    val dups = dups.toList.sortBy{ case (_,idx) => idx }
 
-    val nums = (1 to 9).toSet
-
-    for (cell <- dups1) {
+    for (cell <- dups) {
       cell match {
         case (n, (r,c)) => {
           val rem = rs(r).filterNot(_ == cell).map(_._1).toSet
