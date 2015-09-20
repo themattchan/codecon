@@ -15,7 +15,7 @@ object SudokuError {
   }
 
   def findDups(v: IndexedRow) : Option[List[IndexedCell]] = {
-    val g = v.groupBy{ case (value,_) => value }.filter{ case (_,v) => v.length > 1 }
+    val g = v.groupBy(_._1).filter { case (_,gd) => gd.length > 1 }
     Option(g.values.toList.flatten)
   }
 
@@ -35,8 +35,8 @@ object SudokuError {
     val cs  = getCols(sud)
     val ts  = get3x3s(sud)
 
-    val dups1  = dupsInSect(rs) & dupsInSect(cs) & dupsInSect(ts)
-    val dups = dups.toList.sortBy{ case (_,idx) => idx }
+    val dups1 = dupsInSect(rs) & dupsInSect(cs) & dupsInSect(ts)
+    val dups  = dups1.toList.sortBy(_._2)
 
     for (cell <- dups) {
       cell match {
