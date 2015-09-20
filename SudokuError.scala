@@ -42,7 +42,7 @@ object SudokuError {
       cell match {
         case (n, (r,c)) => {
           val rem = rs(r).filterNot(_ == cell).map(_._1).toSet
-          val List(correctNum) = (nums &~ rem).toList
+          val correctNum = (nums &~ rem).head
           println("[" + r + "," + c + "]=" + correctNum)
         }
       }
