@@ -38,7 +38,7 @@ object SudokuError {
     Option(g.values.toList.flatten)
   }
 
-  def dupsInSect(rs: Grid) : Set[IndexedCell] =
+  def dupsInGrid(rs: Grid) : Set[IndexedCell] =
     rs.map(findDups(_)).filterNot(_.isEmpty).flatMap(_.get).toSet
 
   def getRows(rs: Grid) : Grid = rs
@@ -54,7 +54,7 @@ object SudokuError {
     val cs  = getCols(sud)
     val ts  = get3x3s(sud)
 
-    val dups1 = dupsInSect(rs) & dupsInSect(cs) & dupsInSect(ts)
+    val dups1 = dupsInGrid(rs) & dupsInGrid(cs) & dupsInGrid(ts)
     val dups  = dups1.toList.sortBy(_._2)
 
     for (cell <- dups) {
@@ -62,7 +62,7 @@ object SudokuError {
         case (n, (r,c)) => {
           val rem = rs(r).filterNot(_ == cell).map(_._1).toSet
           val correctNum = (nums &~ rem).head
-          println("[" + r + "," + c + "]=" + correctNum)
+          printf("[%d,%d]=%d", r, c, correctNum)
         }
       }
     }
